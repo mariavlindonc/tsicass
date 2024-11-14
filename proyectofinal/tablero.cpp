@@ -3,16 +3,26 @@
 #include <iostream> 
 using namespace std;
 
-Tablero::Tablero(){
+Tablero::Tablero() {}
 
-}
-
-void Tablero::setTam(int t){
+void Tablero::setTam(int t) {
     tamano = t;
 }
 
+int Tablero::getTam() {
+    return tamano;
+}
+
+void Tablero::setTab(int i, int j, int b) {
+    tablero[i][j] = b;
+}
+
+char Tablero::getTab(int i, int j) {
+    return tablero[i][j];
+}
+
 void Tablero::elegirTam(int e) {
-    switch (e){
+    switch (e) {
     case 1: 
         tamano = 10;
         break;
@@ -24,14 +34,6 @@ void Tablero::elegirTam(int e) {
         tamano = 15;
         break;
     }
-}
-
-int Tablero::getTam(){
-    return tamano;
-}
-
-void Tablero::setTab(int i, int j, char b){
-    tablero[i][j] = b;
 }
 
 void Tablero::iniciarTab() {
@@ -63,30 +65,66 @@ void Tablero::mostrarTab() {
     cout << endl;
 }
 
-Barcos::Barcos(){
+Tablero::~Tablero() {}
 
-}
+Barcos::Barcos() {}
 
 void Barcos::setLar(int l){
-    largo=l;
+    largo = l;
 }
 
-void Barcos::setCoo(int x, int y){
-    coorx=x;
-    coory=y;
+int Barcos::getLar() {
+    return largo;
 }
 
-void Barcos:: setPos(int p){
-    posicion=p;
+void Barcos::setCoo(int x, int y) {
+    coorx = x;
+    coory = y;
+}
+
+int Barcos::getCoo(char o) {
+    if (o == 'x')
+    {
+        return coorx;
+    }
+    else if (o == 'y')
+    {
+        return coory;
+    }
+    else
+    {
+        cout << "ERROR 02.";
+        cout << "Eje de coordenadas inválido.";
+        return -1;
+    }
+}
+
+void Barcos:: setPos(int p) {
+    posicion = p;
 }
 
 int Barcos::getPos() {
     return posicion;
 }
 
+void Barcos::setId(char i) {
+    id = i;
+}
+
+char Barcos::getId() {
+    return id;
+}
+
+bool Barcos::checkHundido(){
+    if (largo == impactos)
+        return true;
+    else
+        return false;
+}
+
 bool Barcos::ubicarBarco(Tablero T){
     if(posicion==1){
-        for (int i=coory; i<largo; i++){
+        for (int i = coory; i < largo; i++){
             if (T.tablero[i][coorx] != ' ') {
                 return false;
             }
@@ -115,22 +153,7 @@ bool Barcos::ubicarBarco(Tablero T){
     }
 }
 
-bool Barcos::checkHundido(){
-    if (largo == impactos)
-        return true;
-    else
-        return false;
-}
-
-void Maquina::iniciarBarcos(Barcos B) {
-    random_device rd;
-    default_random_engine eng(rd());
-    uniform_int_distribution<int> distr(0, tPropio.getTam() - 1);
-    do {
-        B.setCoo(distr(eng), distr(eng));
-        B.ubicarBarco(tPropio);
-    } while (!B.ubicarBarco(tPropio));
-}
+Barcos::~Barcos() {}
 
 Jugador::Jugador() {
     B[0].setId('A');
@@ -153,11 +176,22 @@ Jugador::Jugador() {
     for (int i = 6; i < 10; i++) {
         B[i].setLar(1);
     }
+
+    tPropio.iniciarTab();
+    tRival.iniciarTab();
 }
 
 Tablero Jugador::getTP() {
     return tPropio;
 }
+
+Tablero Jugador::getTR() {
+    return tRival;
+}
+
+Jugador::~Jugador() {}
+
+Maquina::Maquina() {}
 
 int Maquina::tiro(Usuario U) {
     random_device rd;
@@ -170,15 +204,75 @@ int Maquina::tiro(Usuario U) {
             //YA ESTABA TOCADO O HUNDIDO DE ANTES
             return -2;
         } else {
-
+            
         }
     } else {
         //AGUA
-        U.getTP().tablero[y][x] = '-';
+        tRival.tablero[y][x] = '-';
         return -1;
     }
 }
 
-int Usuario::tiro(int y, int x, Maquina M) {
+void Maquina::iniciarBarcos(Barcos B) {
+    random_device rd;
+    default_random_engine eng(rd());
+    uniform_int_distribution<int> distr(0, tPropio.getTam() - 1);
+    do {
+        B.setCoo(distr(eng), distr(eng));
+        B.ubicarBarco(tPropio);
+    } while (!B.ubicarBarco(tPropio));
+}
+
+Maquina::~Maquina() {}
+
+Usuario::Usuario() {}
+
+void Usuario::setNom(string n) {
+    nombre = n;
+}
+
+string Usuario::getNom() {
+    return nombre;
+}
+
+void Usuario::setPun(int p) {
+    puntaje = p;
+}
+
+int Usuario::getPun() {
+    return puntaje;
+}
+
+void Usuario::aumentarPuntaje(int a) {
+    puntaje += a;
+}
+
+int Usuario::tiro(int y, int x, Maquina M)
+{
 
 }
+
+Usuario::~Usuario() {}
+
+Partida::Partida() {}
+
+void Partida::setTur(int r) {
+    turno = r;
+}
+
+void Partida::siguienteTur() {
+    if (turno == 1)
+    {
+        turno = 2;
+    }
+    else
+    {
+        turno == 1;
+    }
+}
+
+bool Partida::checkGanador() {
+
+}
+
+Partida::~Partida() {}

@@ -1,12 +1,13 @@
-class Tablero{
+class Tablero {
     private:  
         int tamano;
     public: 
         char tablero[14][14];
         Tablero();
-        void setTam(int t) { tamano = t; };
-        int getTam() const { return tamano; };
-        void setTab(int i, int j, char b);
+        void setTam(int t);
+        int getTam();
+        void setTab(int i, int j, int b);
+        char getTab(int i, int j);
         void elegirTam(int e);
         void iniciarTab();
         void mostrarTab();
@@ -15,30 +16,24 @@ class Tablero{
 
 class Barcos{
     private: 
-        int largo; 
-        int tamano;
+        int largo;
         int coorx, coory;
-        int posicion;
+        int posicion; //orientación del barco
         int impactos;
         bool hundido;
         char id;
     public: 
         Barcos();
-        int getTam() const { return tamano; };
-        void setTam(int t) { tamano = t; };
         void setLar(int l);
         int getLar();
-        void setCoo(int x, int y) { x = x; y = y; };
-        void setPos(int p){ posicion = p; } ;
+        void setCoo(int x, int y);
+        int getCoo(char o);
+        void setPos(int p);
         int getPos();
-        bool checkHundido();
-        bool ubicarBarco(Tablero T);
         void setId(char i);
         char getId();
-        void ubicarBarco(int tamano){
-            cout<<"Barco de tamaño: "<< tamano << "ubicado. \n";
-        };
-
+        bool checkHundido();
+        bool ubicarBarco(Tablero T);
         ~Barcos();
 };
 
@@ -50,8 +45,17 @@ class Jugador {
     public:
         Jugador();
         Tablero getTP();
+        Tablero getTR();
         int tiro(int y, int x);
         ~Jugador();
+};
+
+class Maquina:public Jugador{
+    public:
+        Maquina();
+        int tiro(Usuario U);
+        void iniciarBarcos(Barcos barco);
+        ~Maquina();
 };
 
 class Usuario:public Jugador{
@@ -60,31 +64,25 @@ class Usuario:public Jugador{
         int puntaje;
     public:
         Usuario();
-        int tiro(int y, int x, Maquina M);
         void setNom(string n);
         string getNom();
         void setPun(int p);
         int getPun();
+        void aumentarPuntaje(int a);
+        int tiro(int y, int x, Maquina M);
         ~Usuario();
-};
-
-class Maquina:public Jugador{
-    public:
-        Maquina();
-        int tiro(Usuario U);
-        void iniciarBarcos(Barcos& barco, int tamano){
-            barco.setTam(tamano);
-        }
-        void iniciarTiro();
-        ~Maquina();
 };
 
 class Partida{
     private:
         int turno;
+        Maquina M;
+        Usuario U;
     public:
         Partida();
         void setTur(int r);
         int getTur();
+        void siguienteTur();
+        bool checkGanador();
         ~Partida();
 };
