@@ -1,9 +1,12 @@
 #include "tablero.h"
-#include <random>
 #include <iostream> 
+#include <cstdlib>
+#include <ctime>
 using namespace std;
 
-Tablero::Tablero() {}
+Tablero::Tablero() {
+    tamano = 15;
+}
 
 void Tablero::setTam(int t) {
     tamano = t;
@@ -14,32 +17,41 @@ int Tablero::getTam() {
 }
 
 void Tablero::setTab(int i, int j, char b) {
-    tablero[i][j] = b;
+    if (i >= 0 && i < MAX_TAB && j >= 0 && j < MAX_TAB) {
+        tablero[i][j] = b;
+    } else {
+        cerr << "Error 06. Índices fuera de rango (" << i << ", " << j << ")" << endl;
+    }
 }
 
 char Tablero::getTab(int i, int j) {
-    return tablero[i][j];
+    if (i >= 0 && i < MAX_TAB && j >= 0 && j < MAX_TAB) {
+        return tablero[i][j];
+    } else {
+        cerr << "Error 06. Índices fuera de rango (" << i << ", " << j << ")" << endl;
+        return '0';
+    }
 }
 
 void Tablero::elegirTam(int e) {
     switch (e) {
     case 1: 
-        tamano = 10;
+        tamano = TAM_1;
         break;
     case 2: 
-        tamano = 12;
+        tamano = TAM_2;
         break;
     case 3: 
     default: 
-        tamano = 15;
+        tamano = TAM_3;
         break;
     }
 }
 
 void Tablero::iniciarTab() {
-    for (int i = 0; i < tamano; i++) {
-        for (int j = 0; j < tamano; j++) {
-            setTab(i, j, ' ');
+    for (int j = 0; j < tamano; j++) {
+        for (int i = 0; i < tamano; i++) {
+            tablero[j][i] = ' ';
         }
     }
 }
@@ -67,7 +79,13 @@ void Tablero::mostrarTab() {
 
 Tablero::~Tablero() {}
 
-Barcos::Barcos() {}
+Barcos::Barcos() {
+    largo = 0;
+    coorx = 0, coory = 0;
+    posicion = 1;
+    impactos = 0;
+    id = ' ';
+}
 
 void Barcos::setLar(int l){
     largo = l;
@@ -93,8 +111,7 @@ int Barcos::getCoo(char o) {
     }
     else
     {
-        cout << "ERROR 02." << endl;
-        cout << "Eje de coordenadas inválido." << endl;
+        cout << "ERROR 02. Eje de coordenadas inválido." << endl;
         return -1;
     }
 }
@@ -130,43 +147,62 @@ bool Barcos::checkHundido(){
         return false;
 }
 
-bool Barcos::ubicarBarco(Tablero T){
+bool Barcos::ubicarBarco(Tablero& T){
+    if (coory < 0 || coory >= MAX_TAB || coorx < 0 || coorx >= MAX_TAB) 
+    {
+        return false;
+    }
     if(posicion == 1){
-        for (int i = coory; i < largo; i++){
-            if (T.tablero[i][coorx] != ' ') {
-                return false;
-            }
-            if (i >= T.getTam()) {
+        if (coory + largo > T.getTam())
+        {
+            return false;
+        }
+        for (int i = coory; i < coory + largo; i++){
+            if (T.getTab(i, coorx) != ' ') {
                 return false;
             }
         }
-        for (int i=coory; i<largo; i++) {
-            T.tablero[i][coorx] = id;
+        for (int i = coory; i < coory + largo; i++) {
+            T.setTab(i, coorx, id);
         }
         return true;
     } else if (posicion == 2) {
-        for(int i = coorx; i < largo; i++){
-            if (T.tablero[i][coorx] != ' ') {
-                return false;
-            }
-            if (i >= T. getTam()) {
+        if (coorx + largo > T.getTam())
+        {
+            return false;
+        }
+        for(int i = coorx; i < coorx + largo; i++){
+            if (T.getTab(coory, i) != ' ') {
                 return false;
             }
         }
-        for (int i=coorx; i<largo; i++) {
-            T.tablero[coory][i] = id;
+        for (int i=coorx; i < coorx + largo; i++) {
+            T.setTab(coory, i, id);
         }
         return true;
     } else {
-        cout << "ERROR 03." << endl;
-        cout << "Orientación inválida!" << endl;
+        cout << "ERROR 03. Orientación inválida!" << endl;
         return false;
     }
 }
 
 Barcos::~Barcos() {}
 
-Jugador::Jugador() {
+Jugador::Jugador() {}
+
+Tablero& Jugador::getTP() {
+    return tPropio;
+}
+
+Tablero& Jugador::getTR() {
+    return tRival;
+}
+
+Barcos& Jugador::getBar(int i) {
+    return B[i];
+}
+
+void Jugador::iniciar() {
     B[0].setId('A');
     B[1].setId('B');
     B[2].setId('C');
@@ -184,24 +220,13 @@ Jugador::Jugador() {
     B[3].setLar(2);
     B[4].setLar(2);
     B[5].setLar(2);
-    for (int i = 6; i < 10; i++) {
-        B[i].setLar(1);
-    }
+    B[6].setLar(1);
+    B[7].setLar(1);
+    B[8].setLar(1);
+    B[9].setLar(1);
 
     tPropio.iniciarTab();
     tRival.iniciarTab();
-}
-
-Tablero Jugador::getTP() {
-    return tPropio;
-}
-
-Tablero Jugador::getTR() {
-    return tRival;
-}
-
-Barcos Jugador::getBar(int i) {
-    return B[i];
 }
 
 int Jugador::identificarBarco(char i) {
@@ -228,8 +253,7 @@ int Jugador::identificarBarco(char i) {
         case 'J':
             return 9;
         default:
-            cout << "ERROR 05." << endl;
-            cout << "Id de barco inválido" << endl;
+            cout << "ERROR 05. Id de barco inválido" << endl;
             return -1;
     }
 }
@@ -238,49 +262,61 @@ Jugador::~Jugador() {}
 
 Maquina::Maquina() {}
 
-int Maquina::tiro(Usuario U) {
-    random_device rd;
-    default_random_engine eng(rd());
-    uniform_int_distribution<int> distr(0, tPropio.getTam() - 1);
-
+int Maquina::tiro(Usuario &U) {
     int y, x;
     do
     {
-        y = distr(eng);
-        x = distr(eng);
+        y = rand() % tPropio.getTam();
+        x = rand() % tPropio.getTam();
     } while (U.getTP().getTab(y,x) == 'O');
 
     if (U.getTP().getTab(y,x) != ' ') {
         char id = U.getTP().getTab(y,x);
-        //IMPACTO
         U.getBar(identificarBarco(id)).setImpactos(U.getBar(identificarBarco(id)).getImpactos() + 1);
         U.getTP().setTab(y,x,'O');
         tRival.setTab(y,x,'O');
         if (U.getBar(identificarBarco(id)).checkHundido())
         {
             //HUNDIDO
-            return -4;
+            return HUNDIDO;
         } else {
             //TOCADO
-            return -3;
+            return TOCADO;
         }
     } else {
         //AGUA
-        tRival.tablero[y][x] = '-';
-        return -1;
+        tRival.setTab(y,x,'-');
+        return AGUA;
     }
 }
 
 void Maquina::iniciarBarcos() {
-    random_device rd;
-    default_random_engine eng(rd());
-    uniform_int_distribution<int> distr(0, tPropio.getTam() - 1);
+    int y, x;
+    bool e;
     for (int i = 0; i < 9; i++)
     {
         do {
-            B[i].setCoo(distr(eng), distr(eng));
-            B[i].ubicarBarco(tPropio);
-        } while (!B[i].ubicarBarco(tPropio));
+            y = rand()%tPropio.getTam();
+            x = rand()%tPropio.getTam();
+            B[i].setCoo(y,x);
+            if (i % 2 == 0)
+            {
+                B[i].setPos(1);
+            } else
+            {
+                B[i].setPos(2);
+            }
+            if (!B[i].ubicarBarco(tPropio))
+            {
+                e = true;
+                y = 0, x = 0;
+                B[i].setPos(1);
+            }
+            else
+            {
+                e = false;
+            }
+        } while (e);
     }
 }
 
@@ -311,12 +347,11 @@ void Usuario::aumentarPuntaje(int a) {
     puntaje += a;
 }
 
-int Usuario::tiro(int y, int x, Maquina M)
+int Usuario::tiro(int y, int x, Maquina &M)
 {
     if (M.getTP().getTab(y,x) != ' ') {
         if (M.getTP().getTab(y,x) == 'O') {
-            //YA ESTABA TOCADO O HUNDIDO DE ANTES
-            return -2;
+            return YA_TOCADO;
         } else {
             char id = M.getTP().getTab(y,x);
             //IMPACTO
@@ -325,26 +360,23 @@ int Usuario::tiro(int y, int x, Maquina M)
             tRival.setTab(y,x,'O');
             if (M.getBar(identificarBarco(id)).checkHundido())
             {
-                //HUNDIDO
-                return -4;
+                return HUNDIDO;
             } else {
-                //TOCADO
-                return -3;
+                return TOCADO;
             }
         }
     } else {
-        //AGUA
-        tRival.tablero[y][x] = '-';
-        return -1;
+        tRival.setTab(y,x,'-');
+        return AGUA;
     }
 }
 
 Usuario::~Usuario() {}
 
 Partida::Partida() {
+    turno = 0;
+    ganador = -1;
     empate = false;
-    turno = 1;
-    ganador = 'o';
 }
 
 void Partida::siguienteTur() {
@@ -360,7 +392,7 @@ void Partida::siguienteTur() {
 
 bool Partida::checkGanador() {
     int u = 0, m = 0;
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 10; i++)
     {
         if (U.getBar(i).checkHundido()) {
             u++;
@@ -372,17 +404,19 @@ bool Partida::checkGanador() {
 
     if (u == 10 && m == 10) {
         empate = true;   
+        return true;
     }
     else if (u == 10) {
-        ganador = u;
+        ganador = 0;
+        return true;
     }
     else if (m == 10) {
-        ganador = m;
+        ganador = 1;
+        return true;
     }
     else {
         return false;
     }
-    return true;
 }
 
 Partida::~Partida() {}

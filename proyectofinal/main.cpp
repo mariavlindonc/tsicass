@@ -6,8 +6,9 @@ void codigo_error(int e);
 
 int main(){
     Partida P;
+    P.U.setNom("guest");
+    P.U.setPun(0);
     int t, p, y, x;
-
     do
     {
         cout<< "Elija el tablero: Ingrese el numero correspondiente" << endl;
@@ -21,9 +22,17 @@ int main(){
         }
     } while (t < 1 || t > 3);
     
+    P.U.getTP().elegirTam(t);
+    P.U.getTR().elegirTam(t);
+    P.M.getTP().elegirTam(t);
+    P.M.getTR().elegirTam(t);
+
+    P.U.iniciar();
+    P.M.iniciar();
+    srand(static_cast<unsigned>(time(0)));
     P.M.iniciarBarcos();
 
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < CAN_BAR; i++)
     {
         bool exito;
         P.U.getTP().mostrarTab();
@@ -32,9 +41,14 @@ int main(){
         {
             cout << "Ubicando barco de " << P.U.getBar(i).getLar() << " espacios de largo." << endl;
             cout << "Indique la orientación del barco." << endl;
-            cout << "[1] Vertical" << endl;
-            cout << "[2] Horizontal" << endl;
-            cin >> p;
+            do {
+                cout << "[1] Vertical" << endl;
+                cout << "[2] Horizontal" << endl;
+                cin >> p;
+                if (p != 1 && p != 2) {
+                    codigo_error(3);
+                }
+            } while (p != 1 && p != 2);
             P.U.getBar(i).setPos(p);
             cout << "El barco se orientara desde la posición inicial hacia abajo, o hacia arriba, según la orientación." << endl;
             cout << "Ingrese la coordenada y (fila) de la posición inicial" << endl;
@@ -76,16 +90,16 @@ int main(){
             
             switch (P.U.tiro(y, x, P.M))
             {
-                case -1:
+                case AGUA:
                     cout << "Agua!" << endl;
                     break;
-                case -2:
+                case YA_TOCADO:
                     cout << "Barco ya tocado/hundido, pierde el turno." << endl;
                     break;
-                case -3:
+                case TOCADO:
                     cout << "Barco tocado." << endl;
                     break;
-                case -4:
+                case HUNDIDO:
                     cout << "Barco hundido!" << endl;
                     break;
                 default:
@@ -97,13 +111,13 @@ int main(){
             
             switch (P.M.tiro(P.U))
             {
-                case -1:
+                case AGUA:
                     cout << "Agua!" << endl;
                     break;
-                case -3:
+                case TOCADO:
                     cout << "Barco tocado." << endl;
                     break;
-                case -4:
+                case HUNDIDO:
                     cout << "Barco hundido!" << endl;
                     break;
                 default:
@@ -130,17 +144,17 @@ int main(){
     {
         cout << "Ha habido un empate!" << endl;
     }
-    else if (P.ganador == 'u')
+    else if (P.ganador == 0)
     {
         cout << "Ganaste! Felicitaciones!" << endl;
+        P.U.aumentarPuntaje(100);
     }
     else
     {
         cout << "Ha ganado la máquina. Más suerte la próxima!" << endl;
+        P.U.aumentarPuntaje(-50);
     }
-    
-    cout << "Gracias por jugar.";
-    return 0;
+    cout << endl;
 }
 
 void codigo_error(int e)
@@ -148,12 +162,13 @@ void codigo_error(int e)
     switch (e)
     {
         case 1:
-            cout << "ERROR 01." << endl; 
-            cout << "Input inválido, reingresar." << endl;
+            cout << "ERROR 01. Input inválido, reingresar." << endl; 
+            break;
+        case 3:
+            cout << "ERROR 03. Orientación inválida! Reingresar." << endl;
             break;
         case 4:
-            cout << "ERROR 04." << endl;
-            cout << "Error en la función tiro." << endl;
+            cout << "ERROR 04. Error en la función tiro." << endl;
             break;
         default:
             cout << "ERROR NO IDENTIFICADO." << endl;
