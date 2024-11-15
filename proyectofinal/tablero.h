@@ -61,7 +61,7 @@ class Maquina:public Jugador{
         ~Maquina();
 };
 
-class Usuario:public Jugador{
+class Usuario:public Jugador{ 
     private:
         string nombre;
         int puntaje;

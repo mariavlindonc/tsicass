@@ -278,7 +278,10 @@ void Maquina::iniciarBarcos() {
 
 Maquina::~Maquina() {}
 
-Usuario::Usuario() {}
+Usuario::Usuario() {
+    nombre = "guest";
+    puntaje = 0;
+}
 
 void Usuario::setNom(string n) {
     nombre = n;
