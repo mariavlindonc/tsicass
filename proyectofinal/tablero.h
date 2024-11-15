@@ -20,18 +20,19 @@ class Barcos{
         int coorx, coory;
         int posicion; //orientación del barco
         int impactos;
-        bool hundido;
         char id;
     public: 
         Barcos();
         void setLar(int l);
         int getLar();
-        void setCoo(int x, int y);
+        void setCoo(int y, int x);
         int getCoo(char o);
         void setPos(int p);
         int getPos();
         void setId(char i);
         char getId();
+        void setImpactos(int s);
+        int getImpactos();
         bool checkHundido();
         bool ubicarBarco(Tablero T);
         ~Barcos();
@@ -41,12 +42,14 @@ class Jugador {
     protected:
         Tablero tPropio;
         Tablero tRival;
-        Barcos B[10];
+        Barcos B[9];
     public:
         Jugador();
         Tablero getTP();
         Tablero getTR();
+        Barcos getBar(int i);
         int tiro(int y, int x);
+        int identificarBarco(char i);
         ~Jugador();
 };
 
@@ -74,14 +77,13 @@ class Usuario:public Jugador{
 };
 
 class Partida{
-    private:
+    public:
         int turno;
         Maquina M;
         Usuario U;
-    public:
+        char ganador;
+        bool empate;
         Partida();
-        void setTur(int r);
-        int getTur();
         void siguienteTur();
         bool checkGanador();
         ~Partida();

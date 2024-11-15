@@ -77,7 +77,7 @@ int Barcos::getLar() {
     return largo;
 }
 
-void Barcos::setCoo(int x, int y) {
+void Barcos::setCoo(int y, int x) {
     coorx = x;
     coory = y;
 }
@@ -115,6 +115,10 @@ char Barcos::getId() {
     return id;
 }
 
+void Barcos::setImpactos(int s) {
+
+}
+
 bool Barcos::checkHundido(){
     if (largo == impactos)
         return true;
@@ -123,7 +127,7 @@ bool Barcos::checkHundido(){
 }
 
 bool Barcos::ubicarBarco(Tablero T){
-    if(posicion==1){
+    if(posicion == 1){
         for (int i = coory; i < largo; i++){
             if (T.tablero[i][coorx] != ' ') {
                 return false;
@@ -136,7 +140,7 @@ bool Barcos::ubicarBarco(Tablero T){
             T.tablero[i][coorx] = id;
         }
         return true;
-    } else {
+    } else if (posicion == 2) {
         for(int i = coorx; i < largo; i++){
             if (T.tablero[i][coorx] != ' ') {
                 return false;
@@ -150,6 +154,9 @@ bool Barcos::ubicarBarco(Tablero T){
             T.tablero[coory][i] = id;
         }
         return true;
+    } else {
+        cout << "ERROR 03";
+        cout << "Orientación inválida!";
     }
 }
 
@@ -189,6 +196,36 @@ Tablero Jugador::getTR() {
     return tRival;
 }
 
+Barcos Jugador::getBar(int i) {
+    return B[i];
+}
+
+int Jugador::identificarBarco(char i) {
+    switch (i)
+    {
+        case 'A':
+            return 0;
+        case 'B':
+            return 1;
+        case 'C':
+            return 2;
+        case 'D':
+            return 3;
+        case 'E':
+            return 4;
+        case 'F':
+            return 5;
+        case 'G':
+            return 6;
+        case 'H':
+            return 7;
+        case 'I':
+            return 8;
+        case 'J':
+            return 9; 
+    }
+}
+
 Jugador::~Jugador() {}
 
 Maquina::Maquina() {}
@@ -198,13 +235,25 @@ int Maquina::tiro(Usuario U) {
     default_random_engine eng(rd());
     uniform_int_distribution<int> distr(0, tPropio.getTam() - 1);
     int y = distr(eng), x = distr(eng);
-    
+
     if (U.getTP().tablero[y][x] != ' ') {
-        if (U.getTP().tablero[y][x] == 'O' || U.getTP().tablero[y][x] == 'X') {
+        if (U.getTP().tablero[y][x] == 'O') {
             //YA ESTABA TOCADO O HUNDIDO DE ANTES
             return -2;
         } else {
-            
+            char id = U.getTP().tablero[y][x];
+            //IMPACTO
+            U.getBar(identificarBarco(id)).setImpactos(U.getBar(identificarBarco(id)).getImpactos() + 1);
+            U.getTP().tablero[y][x] = 'O';
+            tRival.tablero[y][x] = 'O';
+            if (U.getBar(identificarBarco(id)).checkHundido())
+            {
+                //HUNDIDO
+                return -4;
+            } else {
+                //TOCADO
+                return -3;
+            }
         }
     } else {
         //AGUA
@@ -249,15 +298,38 @@ void Usuario::aumentarPuntaje(int a) {
 
 int Usuario::tiro(int y, int x, Maquina M)
 {
-
+    if (M.getTP().tablero[y][x] != ' ') {
+        if (M.getTP().tablero[y][x] == 'O') {
+            //YA ESTABA TOCADO O HUNDIDO DE ANTES
+            return -2;
+        } else {
+            char id = M.getTP().tablero[y][x];
+            //IMPACTO
+            M.getBar(identificarBarco(id)).setImpactos(M.getBar(identificarBarco(id)).getImpactos() + 1);
+            M.getTP().tablero[y][x] = 'O';
+            tRival.tablero[y][x] = 'O';
+            if (M.getBar(identificarBarco(id)).checkHundido())
+            {
+                //HUNDIDO
+                return -4;
+            } else {
+                //TOCADO
+                return -3;
+            }
+        }
+    } else {
+        //AGUA
+        tRival.tablero[y][x] = '-';
+        return -1;
+    }
 }
 
 Usuario::~Usuario() {}
 
-Partida::Partida() {}
-
-void Partida::setTur(int r) {
-    turno = r;
+Partida::Partida() {
+    empate = false;
+    turno = 1;
+    ganador = 'o';
 }
 
 void Partida::siguienteTur() {
@@ -272,7 +344,30 @@ void Partida::siguienteTur() {
 }
 
 bool Partida::checkGanador() {
+    int u = 0, m = 0;
+    for (int i = 0; i < 9; i++)
+    {
+        if (U.getBar(i).checkHundido()) {
+            u++;
+        }
+        if (M.getBar(i).checkHundido()) {
+            m++;
+        }
+    }
 
+    if (u == 10 && m == 10) {
+        empate = true;   
+    }
+    else if (u == 10) {
+        ganador = u;
+    }
+    else if (m == 10) {
+        ganador = m;
+    }
+    else {
+        return false;
+    }
+    return true;
 }
 
 Partida::~Partida() {}
