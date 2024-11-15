@@ -346,7 +346,7 @@ void Partida::siguienteTur() {
     }
     else
     {
-        turno == 1;
+        turno = 1;
     }
 }
 

@@ -1,3 +1,7 @@
+#include <iostream>
+
+using namespace std;
+
 class Tablero {
     private:  
         int tamano;

@@ -130,7 +130,7 @@ int main(){
     {
         cout << "Ha habido un empate!" << endl;
     }
-    else if (P.ganador = 'u')
+    else if (P.ganador == 'u')
     {
         cout << "Ganaste! Felicitaciones!" << endl;
     }
