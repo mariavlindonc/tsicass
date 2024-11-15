@@ -57,7 +57,7 @@ class Maquina:public Jugador{
     public:
         Maquina();
         int tiro(Usuario U);
-        void iniciarBarcos(Barcos barco);
+        void iniciarBarcos();
         ~Maquina();
 };
 

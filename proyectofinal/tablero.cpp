@@ -93,8 +93,8 @@ int Barcos::getCoo(char o) {
     }
     else
     {
-        cout << "ERROR 02.";
-        cout << "Eje de coordenadas inválido.";
+        cout << "ERROR 02." << endl;
+        cout << "Eje de coordenadas inválido." << endl;
         return -1;
     }
 }
@@ -155,8 +155,8 @@ bool Barcos::ubicarBarco(Tablero T){
         }
         return true;
     } else {
-        cout << "ERROR 03";
-        cout << "Orientación inválida!";
+        cout << "ERROR 03." << endl;
+        cout << "Orientación inválida!" << endl;
     }
 }
 
@@ -234,26 +234,27 @@ int Maquina::tiro(Usuario U) {
     random_device rd;
     default_random_engine eng(rd());
     uniform_int_distribution<int> distr(0, tPropio.getTam() - 1);
-    int y = distr(eng), x = distr(eng);
+    
+    int y, x;
+    do
+    {
+        y = distr(eng);
+        x = distr(eng);
+    } while (U.getTP().tablero[y][x] == 'O');
 
     if (U.getTP().tablero[y][x] != ' ') {
-        if (U.getTP().tablero[y][x] == 'O') {
-            //YA ESTABA TOCADO O HUNDIDO DE ANTES
-            return -2;
+        char id = U.getTP().tablero[y][x];
+        //IMPACTO
+        U.getBar(identificarBarco(id)).setImpactos(U.getBar(identificarBarco(id)).getImpactos() + 1);
+        U.getTP().tablero[y][x] = 'O';
+        tRival.tablero[y][x] = 'O';
+        if (U.getBar(identificarBarco(id)).checkHundido())
+        {
+            //HUNDIDO
+            return -4;
         } else {
-            char id = U.getTP().tablero[y][x];
-            //IMPACTO
-            U.getBar(identificarBarco(id)).setImpactos(U.getBar(identificarBarco(id)).getImpactos() + 1);
-            U.getTP().tablero[y][x] = 'O';
-            tRival.tablero[y][x] = 'O';
-            if (U.getBar(identificarBarco(id)).checkHundido())
-            {
-                //HUNDIDO
-                return -4;
-            } else {
-                //TOCADO
-                return -3;
-            }
+            //TOCADO
+            return -3;
         }
     } else {
         //AGUA
@@ -262,14 +263,17 @@ int Maquina::tiro(Usuario U) {
     }
 }
 
-void Maquina::iniciarBarcos(Barcos B) {
+void Maquina::iniciarBarcos() {
     random_device rd;
     default_random_engine eng(rd());
     uniform_int_distribution<int> distr(0, tPropio.getTam() - 1);
-    do {
-        B.setCoo(distr(eng), distr(eng));
-        B.ubicarBarco(tPropio);
-    } while (!B.ubicarBarco(tPropio));
+    for (int i = 0; i < 9; i++)
+    {
+        do {
+            B[i].setCoo(distr(eng), distr(eng));
+            B[i].ubicarBarco(tPropio);
+        } while (!B[i].ubicarBarco(tPropio));
+    }
 }
 
 Maquina::~Maquina() {}
@@ -335,7 +339,7 @@ Partida::Partida() {
 void Partida::siguienteTur() {
     if (turno == 1)
     {
-        turno = 2;
+        turno = 0;
     }
     else
     {
