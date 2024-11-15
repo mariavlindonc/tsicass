@@ -13,7 +13,7 @@ int Tablero::getTam() {
     return tamano;
 }
 
-void Tablero::setTab(int i, int j, int b) {
+void Tablero::setTab(int i, int j, char b) {
     tablero[i][j] = b;
 }
 
@@ -116,7 +116,11 @@ char Barcos::getId() {
 }
 
 void Barcos::setImpactos(int s) {
+    impactos = s;
+}
 
+int Barcos::getImpactos() {
+    return impactos;
 }
 
 bool Barcos::checkHundido(){
@@ -148,7 +152,6 @@ bool Barcos::ubicarBarco(Tablero T){
             if (i >= T. getTam()) {
                 return false;
             }
-            T.tablero[coory][i];
         }
         for (int i=coorx; i<largo; i++) {
             T.tablero[coory][i] = id;
@@ -157,6 +160,7 @@ bool Barcos::ubicarBarco(Tablero T){
     } else {
         cout << "ERROR 03." << endl;
         cout << "Orientación inválida!" << endl;
+        return false;
     }
 }
 
@@ -222,7 +226,11 @@ int Jugador::identificarBarco(char i) {
         case 'I':
             return 8;
         case 'J':
-            return 9; 
+            return 9;
+        default:
+            cout << "ERROR 05." << endl;
+            cout << "Id de barco inválido" << endl;
+            return -1;
     }
 }
 
@@ -234,20 +242,20 @@ int Maquina::tiro(Usuario U) {
     random_device rd;
     default_random_engine eng(rd());
     uniform_int_distribution<int> distr(0, tPropio.getTam() - 1);
-    
+
     int y, x;
     do
     {
         y = distr(eng);
         x = distr(eng);
-    } while (U.getTP().tablero[y][x] == 'O');
+    } while (U.getTP().getTab(y,x) == 'O');
 
-    if (U.getTP().tablero[y][x] != ' ') {
-        char id = U.getTP().tablero[y][x];
+    if (U.getTP().getTab(y,x) != ' ') {
+        char id = U.getTP().getTab(y,x);
         //IMPACTO
         U.getBar(identificarBarco(id)).setImpactos(U.getBar(identificarBarco(id)).getImpactos() + 1);
-        U.getTP().tablero[y][x] = 'O';
-        tRival.tablero[y][x] = 'O';
+        U.getTP().setTab(y,x,'O');
+        tRival.setTab(y,x,'O');
         if (U.getBar(identificarBarco(id)).checkHundido())
         {
             //HUNDIDO
@@ -305,16 +313,16 @@ void Usuario::aumentarPuntaje(int a) {
 
 int Usuario::tiro(int y, int x, Maquina M)
 {
-    if (M.getTP().tablero[y][x] != ' ') {
-        if (M.getTP().tablero[y][x] == 'O') {
+    if (M.getTP().getTab(y,x) != ' ') {
+        if (M.getTP().getTab(y,x) == 'O') {
             //YA ESTABA TOCADO O HUNDIDO DE ANTES
             return -2;
         } else {
-            char id = M.getTP().tablero[y][x];
+            char id = M.getTP().getTab(y,x);
             //IMPACTO
             M.getBar(identificarBarco(id)).setImpactos(M.getBar(identificarBarco(id)).getImpactos() + 1);
-            M.getTP().tablero[y][x] = 'O';
-            tRival.tablero[y][x] = 'O';
+            M.getTP().setTab(y,x,'O');
+            tRival.setTab(y,x,'O');
             if (M.getBar(identificarBarco(id)).checkHundido())
             {
                 //HUNDIDO

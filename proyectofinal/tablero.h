@@ -2,6 +2,9 @@
 #include <string>
 using namespace std;
 
+class Usuario;
+class Maquina;
+
 class Tablero {
     private:  
         int tamano;
@@ -10,7 +13,7 @@ class Tablero {
         Tablero();
         void setTam(int t);
         int getTam();
-        void setTab(int i, int j, int b);
+        void setTab(int i, int j, char b);
         char getTab(int i, int j);
         void elegirTam(int e);
         void iniciarTab();
@@ -52,7 +55,6 @@ class Jugador {
         Tablero getTP();
         Tablero getTR();
         Barcos getBar(int i);
-        int tiro(int y, int x);
         int identificarBarco(char i);
         ~Jugador();
 };
