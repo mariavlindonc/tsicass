@@ -293,7 +293,7 @@ int Maquina::tiro(Usuario &U) {
 void Maquina::iniciarBarcos() {
     int y, x;
     bool e;
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < CAN_BAR; i++)
     {
         do {
             y = rand()%tPropio.getTam();
@@ -407,11 +407,11 @@ bool Partida::checkGanador() {
         return true;
     }
     else if (u == 10) {
-        ganador = 0;
+        ganador = 1;
         return true;
     }
     else if (m == 10) {
-        ganador = 1;
+        ganador = 0;
         return true;
     }
     else {

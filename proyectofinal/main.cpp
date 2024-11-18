@@ -31,6 +31,7 @@ int main(){
     P.M.iniciar();
     srand(static_cast<unsigned>(time(0)));
     P.M.iniciarBarcos();
+    P.M.getTP().mostrarTab();
 
     for (int i = 0; i < CAN_BAR; i++)
     {
@@ -50,7 +51,7 @@ int main(){
                 }
             } while (p != 1 && p != 2);
             P.U.getBar(i).setPos(p);
-            cout << "El barco se orientara desde la posición inicial hacia abajo, o hacia arriba, según la orientación." << endl;
+            cout << "El barco se orientara desde la posición inicial hacia abajo, o hacia la derecha, según la orientación." << endl;
             cout << "Ingrese la coordenada y (fila) de la posición inicial" << endl;
             cin >> y;
             cout << "Ingrese la coordenada x (columna) de la posición inicial" <<endl;
@@ -124,12 +125,6 @@ int main(){
                     codigo_error(4);
             }
         }
-
-        cout << "TABLERO PROPIO" << endl;
-        P.U.getTP().mostrarTab();
-        cout << endl;
-        cout << "TABLERO DEL RIVAL" << endl;
-        P.U.getTR().mostrarTab();
 
     } while (!P.checkGanador());
     
